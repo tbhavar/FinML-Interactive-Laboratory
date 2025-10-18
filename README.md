@@ -1,5 +1,7 @@
 FinML Interactive Laboratory 💡
+
 Project Description
+
 Welcome to the FinML Interactive Laboratory, an open-source, educational web application designed to demystify core Machine Learning (ML) concepts through direct application in the financial domain.
 
 Developed as a single, lightweight HTML file, this project is ideal for students, financial analysts, and consultants looking to understand the intuition behind quantitative finance models without needing to run complex code. By providing an interactive sandbox, the lab allows users to visually manipulate model parameters and immediately observe the impact on outcomes like risk prediction and price forecasting.
