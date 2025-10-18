@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FinML Interactive Laboratory</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Custom styles for professional aesthetic and rounded corners */
+        .card {
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+        }
+        /* Custom scrollbar for better visual integration (optional but nice) */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background-color: #4a5568; /* Gray-700 for dark mode */
+            border-radius: 4px;
+        }
+        /* Theme Transition */
+        body, .card, button, input {
+            transition: background-color 0.4s, color 0.4s;
+        }
+    </style>
+    <script>
+        // Tailwind Configuration (Optional: Customizing colors/theme)
+        tailwind.config = {
+            darkMode: 'class', // Enable class-based dark mode
+            theme: {
+                extend: {
+                    colors: {
+                        'dark-bg': '#0F172A',      /* Slate-900 */
+                        'dark-card': '#1E293B',    /* Slate-800 */
+                        'accent-blue': '#3B82F6',  /* Blue-500 */
+                        'light-bg': '#F1F5F9',     /* Slate-100 */
+                        'light-card': '#FFFFFF',   /* White */
+                        'text-dark': '#E2E8F0',    /* Slate-200 */
+                        'text-light': '#1E293B',   /* Slate-800 */
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+
+<body class="dark bg-dark-bg text-text-dark font-sans min-h-screen p-4 sm:p-8">
+
+    <header class="flex justify-between items-center mb-10 pb-4 border-b border-slate-700/50">
+        <h1 class="text-3xl sm:text-4xl font-bold text-white">FinML Interactive Laboratory</h1>
+        <button id="theme-toggle" class="p-3 rounded-full bg-dark-card hover:bg-slate-700 text-white transition duration-300 shadow-lg">
+            <svg id="sun-icon" class="w-6 h-6 hidden" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="m4.93 19.07 1.41-1.41"/><path d="m17.66 6.34 1.41-1.41"/></svg>
+            <svg id="moon-icon" class="w-6 h-6" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>
+        </button>
+    </header>
+
+    <section class="mb-12 text-lg text-slate-300 max-w-4xl mx-auto">
+        <p>Welcome to the **FinML Interactive Laboratory**. Engage directly with core machine learning concepts applied to financial data. Adjust parameters, run simulations, and visualize how models learn to forecast and classify in a high-stakes environment.</p>
+    </section>
+
+   <main class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+
+    <div class="card bg-dark-card p-6 rounded-xl shadow-2xl border border-slate-700/50">
+        <h2 class="text-2xl font-semibold mb-3 text-accent-blue flex items-center">
+            <svg class="w-6 h-6 mr-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 20V10"/><path d="M12 20V4"/><path d="M6 20v-6"/></svg>
+            1. Stock Price Regression
+        </h2>
+        <p class="text-slate-400 mb-6">Explore **Linear Regression** and the balance between **Underfitting** and **Overfitting**. The goal is to predict future stock prices based on historical data.</p>
+        
+        <div class="flex flex-col sm:flex-row sm:justify-between items-center mb-6 p-4 rounded-lg bg-slate-800/50 border border-slate-700">
+            <div class="w-full sm:w-3/5">
+                <label for="complexity-slider" class="block text-sm font-medium mb-2 text-slate-300">Model Complexity (Polynomial Degree): <span id="complexity-value" class="font-bold text-accent-blue">5</span></label>
+                <input type="range" id="complexity-slider" min="1" max="10" value="5" class="w-full h-2 bg-slate-600 rounded-lg appearance-none cursor-pointer range-lg">
+            </div>
+            <button id="train-model-btn" class="mt-4 sm:mt-0 sm:ml-4 px-6 py-2 bg-accent-blue text-white font-semibold rounded-lg hover:bg-blue-600 transition duration-300 shadow-md">
+                Train Model
+            </button>
+        </div>
+
+        <div class="bg-slate-900 rounded-lg p-2 border border-slate-700">
+            <canvas id="stock-chart" width="800" height="400" class="w-full h-auto"></canvas>
+        </div>
+
+        <div class="mt-4 flex justify-between text-sm font-mono p-3 rounded-lg bg-slate-800 border border-slate-700">
+            <p class="text-slate-400">MSE (Mean Squared Error):</p>
+            <p id="mse-metric" class="font-bold text-red-400">--</p>
+        </div>
+    </div>
+    <div class="card bg-dark-card p-6 rounded-xl shadow-2xl border border-slate-700/50">
+        <h2 class="text-2xl font-semibold mb-3 text-white flex items-center">
+            <svg class="w-6 h-6 mr-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M16 16.2A3 3 0 0 0 12 14c-1.5 0-3 1.1-3 2.2"/></svg>
+            2. Credit Risk Classification
+        </h2>
+        <p class="text-slate-400 mb-6">See a simple **Logistic Regression** model classify a loan applicant. The model uses **Annual Income** and **Debt-to-Income Ratio (DTI)** to predict **Default Risk**.</p>
+        
+        <div class="grid grid-cols-2 gap-4 mb-6">
+            <div>
+                <label for="input-income" class="block text-sm font-medium mb-1 text-slate-300">Annual Income (₹ in Lakhs)</label>
+                <input type="number" id="input-income" value="80" min="20" max="200" class="w-full p-2 rounded-lg bg-slate-700 text-white border border-slate-600 focus:ring-accent-blue focus:border-accent-blue" placeholder="e.g., 80">
+            </div>
+            <div>
+                <label for="input-dti" class="block text-sm font-medium mb-1 text-slate-300">Debt-to-Income Ratio (%)</label>
+                <input type="number" id="input-dti" value="35" min="5" max="90" class="w-full p-2 rounded-lg bg-slate-700 text-white border border-slate-600 focus:ring-accent-blue focus:border-accent-blue" placeholder="e.g., 35">
+            </div>
+        </div>
+
+        <button id="classify-btn" class="w-full mb-6 px-6 py-3 bg-green-600 text-white font-semibold rounded-lg hover:bg-green-700 transition duration-300 shadow-md">
+            Check Loan Status
+        </button>
+
+        <div class="p-4 rounded-lg bg-slate-800 border border-slate-700">
+            <h3 class="text-xl font-bold mb-3 text-slate-300">Model Prediction:</h3>
+            
+            <div id="status-display" class="p-3 text-center rounded-lg font-extrabold text-2xl transition duration-500 min-h-[4rem] flex items-center justify-center">
+                <span class="text-slate-500">Enter data and click 'Check'</span>
+            </div>
+
+            <div class="mt-4 text-sm text-slate-400">
+                <p class="font-semibold">Decision Boundary Visual (Placeholder):</p>
+                <div class="w-full h-16 rounded-lg relative overflow-hidden mt-1 border-2 border-slate-600">
+                    <div class="absolute inset-0 bg-red-800/20" style="clip-path: polygon(0 0, 100% 0, 0% 100%);"></div>
+                    <div class="absolute inset-0 bg-green-800/20" style="clip-path: polygon(100% 0, 100% 100%, 0 100%);"></div>
+                    <div id="applicant-dot" class="w-3 h-3 rounded-full absolute transition-all duration-500 border-2 border-white" style="left: 40%; top: 60%; background-color: #3B82F6;"></div>
+                    <span class="absolute top-1 left-1 text-xs text-green-300">Low Risk (Approved)</span>
+                    <span class="absolute bottom-1 right-1 text-xs text-red-300">High Risk (Denied)</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="card bg-dark-card p-6 rounded-xl shadow-2xl border border-slate-700/50 lg:col-span-2">
+        <h2 class="text-2xl font-semibold mb-3 text-white flex items-center">
+            <svg class="w-6 h-6 mr-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+            3. Algorithmic Trading Signals
+        </h2>
+        <p class="text-slate-400 mb-6">Simulate a reinforcement learning or time series model generating real-time trading signals (**Buy/Sell**) based on the last 10 steps of price action. Click **'Run 10 Steps'** to advance the market.</p>
+        
+        <div class="flex justify-center mb-6">
+            <button id="run-steps-btn" class="px-8 py-3 bg-yellow-500 text-slate-900 font-bold rounded-lg hover:bg-yellow-600 transition duration-300 shadow-md">
+                Run 10 Steps
+            </button>
+        </div>
+
+        <div class="bg-slate-900 rounded-lg p-2 border border-slate-700 overflow-x-scroll">
+            <canvas id="trading-chart" width="1200" height="300" class="min-w-full h-auto"></canvas>
+        </div>
+
+        <div class="mt-4 flex justify-between text-sm font-mono p-3 rounded-lg bg-slate-800 border border-slate-700">
+            <p class="text-slate-400">Total Steps Simulated:</p>
+            <p id="total-steps" class="font-bold text-yellow-400">0</p>
+        </div>
+    </div>
+
+    </main>
+
+<section class="mt-12 pt-6 border-t border-slate-700/50 max-w-4xl mx-auto">
+        <div class="card bg-dark-card p-6 rounded-xl shadow-2xl">
+            <h2 class="text-xl font-bold mb-4 text-white border-b border-slate-600 pb-2">Disclaimer & Professional Connection</h2>
+            
+            <div class="mb-6 text-sm text-slate-400 bg-slate-800/50 p-4 rounded-lg border border-red-500/30">
+                <h3 class="font-semibold text-red-400 mb-2 flex items-center">
+                    <svg class="w-5 h-5 mr-1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.46 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>
+                    Disclaimer
+                </h3>
+                <p class="mb-1">This tool is provided for **informational and educational purposes only**. It is designed to offer a general estimation or guidance based on the inputs provided.</p>
+                <p class="mb-1">It **does not constitute**, and should not be relied upon as, **professional accounting, legal, tax, financial, or other advisory services**. The results are not a substitute for professional consultation with a qualified chartered accountant who can review your specific facts and circumstances.</p>
+                <p>No responsibility is accepted for any loss or damage arising from the use or reliance on the information provided by this tool. By using this tool, you acknowledge and agree to these terms.</p>
+            </div>
+
+            <div class="text-sm text-slate-300">
+                <h3 class="font-semibold text-accent-blue mb-2 flex items-center">
+                    <svg class="w-5 h-5 mr-1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                    Attribution and Connection
+                </h3>
+                <p class="mb-2">Tool Created By: **Tanmay Rajendra Bhavar, Chartered Accountant and Founder of TRB & Co.**</p>
+                <p>Let's Connect:</p>
+                <p class="pl-4 text-slate-400">For personalized professional advice regarding your business, tax planning, or consultancy needs, please connect with me directly on LinkedIn. We look forward to partnering with you.</p>
+            </div>
+<script>
+    // --- TAILWIND CONFIG (Needed for dark mode/color definitions) ---
+    tailwind.config = {
+        darkMode: 'class', 
+        theme: {
+            extend: {
+                colors: {
+                    'dark-bg': '#0F172A',
+                    'dark-card': '#1E293B',
+                    'accent-blue': '#3B82F6',
+                    'light-bg': '#F1F5F9',
+                    'light-card': '#FFFFFF',
+                    'text-dark': '#E2E8F0',
+                    'text-light': '#1E293B',
+                },
+                fontFamily: {
+                    sans: ['Inter', 'sans-serif'],
+                }
+            }
+        }
+    }
+
+    // --- 1. THEME TOGGLE LOGIC ---
+    const body = document.body;
+    const themeToggle = document.getElementById('theme-toggle');
+    const sunIcon = document.getElementById('sun-icon');
+    const moonIcon = document.getElementById('moon-icon');
+
+    // Check for saved theme preference or default to dark
+    const savedTheme = localStorage.getItem('theme') || 'dark';
+    if (savedTheme === 'light') {
+        body.classList.remove('dark');
+        sunIcon.classList.remove('hidden');
+        moonIcon.classList.add('hidden');
+    } else {
+        sunIcon.classList.add('hidden');
+        moonIcon.classList.remove('hidden');
+    }
+
+    themeToggle.addEventListener('click', () => {
+        body.classList.toggle('dark');
+        const isDark = body.classList.contains('dark');
+        localStorage.setItem('theme', isDark ? 'dark' : 'light');
+
+        sunIcon.classList.toggle('hidden', isDark);
+        moonIcon.classList.toggle('hidden', !isDark);
+    });
+
+    // --- 2. MODULE 1: REGRESSION LOGIC ---
+    const canvas1 = document.getElementById('stock-chart');
+    const ctx1 = canvas1.getContext('2d');
+    const complexitySlider = document.getElementById('complexity-slider');
+    const complexityValueSpan = document.getElementById('complexity-value');
+    const trainButton = document.getElementById('train-model-btn');
+    const mseMetric = document.getElementById('mse-metric');
+
+    const DATA_POINTS_1 = 50;
+    let data1 = [];
+
+    function generateData1() {
+        let basePrice = 50;
+        data1 = [];
+        for (let i = 0; i < DATA_POINTS_1; i++) {
+            basePrice += (Math.random() - 0.5) * 5 + 0.5;
+            data1.push({ x: i, y: basePrice });
+        }
+    }
+    function calculatePrediction(x, degree) {
+        let sum = 0.5 * x;
+        if (degree >= 3) { sum += 0.05 * Math.sin(x / 5); }
+        if (degree >= 7) { sum += 0.5 * Math.sin(x / 2) * Math.cos(x / 10); }
+        return 30 + sum;
+    }
+    function calculateMSE(predictions) {
+        let totalError = 0;
+        for (let i = 0; i < DATA_POINTS_1; i++) {
+            const error = data1[i].y - predictions[i].y;
+            totalError += error * error;
+        }
+        return (totalError / DATA_POINTS_1).toFixed(2);
+    }
+    function drawChart1(predictions = null) {
+        ctx1.clearRect(0, 0, canvas1.width, canvas1.height);
+        const xMax = DATA_POINTS_1 - 1;
+        const yMin = Math.min(...data1.map(p => p.y)) - 5;
+        const yMax = Math.max(...data1.map(p => p.y)) + 5;
+        const scaleX = canvas1.width / xMax;
+        const scaleY = canvas1.height / (yMax - yMin);
+        const getYCoord = (y) => canvas1.height - (y - yMin) * scaleY;
+        const getXCoord = (x) => x * scaleX;
+
+        ctx1.beginPath();
+        ctx1.strokeStyle = '#3B82F6';
+        ctx1.lineWidth = 2;
+        data1.forEach((point, i) => {
+            const x = getXCoord(point.x);
+            const y = getYCoord(point.y);
+            if (i === 0) { ctx1.moveTo(x, y); } else { ctx1.lineTo(x, y); }
+            ctx1.fillStyle = '#3B82F6';
+            ctx1.fillRect(x - 1.5, y - 1.5, 3, 3);
+        });
+        ctx1.stroke();
+
+        if (predictions) {
+            ctx1.beginPath();
+            ctx1.strokeStyle = '#EF4444';
+            ctx1.lineWidth = 2;
+            predictions.forEach((point, i) => {
+                const x = getXCoord(point.x);
+                const y = getYCoord(point.y);
+                if (i === 0) { ctx1.moveTo(x, y); } else { ctx1.lineTo(x, y); }
+            });
+            ctx1.stroke();
+        }
+    }
+
+    complexitySlider.addEventListener('input', (e) => {
+        complexityValueSpan.textContent = e.target.value;
+        drawChart1();
+        mseMetric.textContent = '--';
+    });
+
+    trainButton.addEventListener('click', () => {
+        const degree = parseInt(complexitySlider.value);
+        const predictions = data1.map(point => ({
+            x: point.x,
+            y: calculatePrediction(point.x, degree)
+        }));
+        const mse = calculateMSE(predictions);
+
+        mseMetric.classList.remove('text-red-400', 'text-yellow-400', 'text-green-400');
+        if (mse < 10) { mseMetric.classList.add('text-green-400'); } 
+        else if (mse < 30) { mseMetric.classList.add('text-yellow-400'); } 
+        else { mseMetric.classList.add('text-red-400'); }
+        
+        mseMetric.textContent = mse;
+        drawChart1(predictions);
+    });
+
+    generateData1();
+    drawChart1();
+    
+    // --- 3. MODULE 2: CLASSIFICATION LOGIC ---
+    const inputIncome = document.getElementById('input-income');
+    const inputDTI = document.getElementById('input-dti');
+    const classifyButton = document.getElementById('classify-btn');
+    const statusDisplay = document.getElementById('status-display');
+    const applicantDot = document.getElementById('applicant-dot');
+    
+    const INCOME_WEIGHT = 0.5;
+    const DTI_WEIGHT = -1.5;
+    const THRESHOLD = 10;
+
+    function classifyApplicant() {
+        const income = parseFloat(inputIncome.value);
+        const dti = parseFloat(inputDTI.value);
+
+        if (isNaN(income) || isNaN(dti) || income < 20 || dti < 5) {
+            statusDisplay.className = 'p-3 text-center rounded-lg font-extrabold text-2xl bg-red-800/20 text-red-400 transition duration-500';
+            statusDisplay.innerHTML = '⚠️ Invalid Input';
+            return;
+        }
+
+        const score = (INCOME_WEIGHT * income) + (DTI_WEIGHT * dti);
+        let statusText;
+        let statusClass;
+        let dotColor;
+
+        if (score > THRESHOLD) {
+            statusText = 'LOAN APPROVED! ✅ (Low Risk)';
+            statusClass = 'bg-green-800/30 text-green-400 border border-green-600';
+            dotColor = '#10B981';
+        } else {
+            statusText = 'LOAN DENIED 🛑 (High Risk)';
+            statusClass = 'bg-red-800/30 text-red-400 border border-red-600';
+            dotColor = '#EF4444';
+        }
+
+        statusDisplay.className = `p-3 text-center rounded-lg font-extrabold text-2xl transition duration-500 ${statusClass}`;
+        statusDisplay.innerHTML = statusText;
+
+        const normIncome = Math.min(100, (income - 20) / (200 - 20) * 100);
+        const normDTI = 100 - Math.min(100, (dti - 5) / (90 - 5) * 100); 
+
+        applicantDot.style.left = `${normIncome}%`;
+        applicantDot.style.top = `${normDTI}%`;
+        applicantDot.style.backgroundColor = dotColor;
+
+        classifyButton.classList.remove('bg-green-600', 'bg-red-600');
+        classifyButton.classList.add(score > THRESHOLD ? 'bg-green-600' : 'bg-red-600');
+        setTimeout(() => {
+            classifyButton.classList.remove('bg-red-600');
+            if (score <= THRESHOLD) classifyButton.classList.add('bg-green-600');
+        }, 500);
+    }
+
+    classifyButton.addEventListener('click', classifyApplicant);
+    inputIncome.addEventListener('change', classifyApplicant);
+    inputDTI.addEventListener('change', classifyApplicant);
+    classifyApplicant();
+
+    // --- 4. MODULE 3: TRADING SIGNALS LOGIC ---
+    const canvas3 = document.getElementById('trading-chart');
+    const ctx3 = canvas3.getContext('2d');
+    const runStepsBtn = document.getElementById('run-steps-btn');
+    const totalStepsMetric = document.getElementById('total-steps');
+
+    const STEP_SIZE = 10;
+    let tradingData = [];
+    let totalSteps = 0;
+    let signals = [];
+
+    function initializeTradingData() {
+        tradingData = [{ x: 0, y: 100 }];
+        signals = [];
+        totalSteps = 0;
+        totalStepsMetric.textContent = totalSteps;
+        drawTradingChart();
+    }
+
+    function generateNewSteps() {
+        const lastY = tradingData[tradingData.length - 1].y;
+        let currentPrice = lastY;
+
+        for (let i = 1; i <= STEP_SIZE; i++) {
+            currentPrice += (Math.random() - 0.5) * 2;
+            currentPrice = Math.max(50, currentPrice);
+            tradingData.push({ x: tradingData.length, y: currentPrice });
+
+            if (i === STEP_SIZE) {
+                // Check price difference over last 10 steps for a signal
+                const startIndex = Math.max(0, tradingData.length - 11); 
+                const priceDiff = tradingData[tradingData.length - 1].y - tradingData[startIndex].y;
+                let signalType = null;
+                if (priceDiff < -5) {
+                    signalType = 'BUY'; 
+                } else if (priceDiff > 5) {
+                    signalType = 'SELL';
+                }
+                
+                if (signalType) {
+                    signals.push({ x: tradingData.length - 1, type: signalType });
+                }
+            }
+        }
+        totalSteps += STEP_SIZE;
+        totalStepsMetric.textContent = totalSteps;
+    }
+
+    function drawTradingChart() {
+        ctx3.clearRect(0, 0, canvas3.width, canvas3.height);
+        
+        if (tradingData.length <= 1) return;
+
+        const dataToDraw = tradingData.slice(Math.max(0, tradingData.length - 100));
+        const offset = tradingData.length > 100 ? tradingData.length - 100 : 0;
+
+        const yMin = Math.min(...dataToDraw.map(p => p.y)) - 5;
+        const yMax = Math.max(...dataToDraw.map(p => p.y)) + 5;
+        const xMax = 100;
+        
+        const scaleX = canvas3.width / xMax;
+        const scaleY = canvas3.height / (yMax - yMin);
+
+        const getYCoord = (y) => canvas3.height - (y - yMin) * scaleY;
+        const getXCoord = (x) => (x - offset) * scaleX;
+
+        // 1. Draw Price Line
+        ctx3.beginPath();
+        ctx3.strokeStyle = '#3B82F6';
+        ctx3.lineWidth = 3;
+        dataToDraw.forEach((point, i) => {
+            const x = getXCoord(point.x);
+            const y = getYCoord(point.y);
+            if (i === 0) {
+                ctx3.moveTo(x, y);
+            } else {
+                ctx3.lineTo(x, y);
+            }
+        });
+        ctx3.stroke();
+
+        // 2. Draw Signals (Icons)
+        signals.filter(s => s.x >= offset).forEach(signal => {
+            const point = tradingData[signal.x];
+            const x = getXCoord(point.x);
+            const y = getYCoord(point.y);
+            
+            ctx3.fillStyle = signal.type === 'BUY' ? '#10B981' : '#EF4444'; 
+            ctx3.font = '20px sans-serif';
+            ctx3.fillText(signal.type === 'BUY' ? '▲' : '▼', x - 10, y + (signal.type === 'BUY' ? -15 : 25));
+        });
+    }
+
+    runStepsBtn.addEventListener('click', () => {
+        generateNewSteps();
+        drawTradingChart();
+    });
+
+    initializeTradingData();
+</script>
+
+</body>
+</html>
